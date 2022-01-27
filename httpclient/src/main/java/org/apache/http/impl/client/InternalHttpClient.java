@@ -149,11 +149,15 @@ class InternalHttpClient extends CloseableHttpClient implements Configurable {
         }
     }
 
+    /**
+     * 执行 http 的入口逻辑
+     * */
     @Override
     protected CloseableHttpResponse doExecute(
             final HttpHost target,
             final HttpRequest request,
             final HttpContext context) throws IOException, ClientProtocolException {
+
         Args.notNull(request, "HTTP request");
         HttpExecutionAware execAware = null;
         if (request instanceof HttpExecutionAware) {
@@ -161,8 +165,9 @@ class InternalHttpClient extends CloseableHttpClient implements Configurable {
         }
         try {
             final HttpRequestWrapper wrapper = HttpRequestWrapper.wrap(request, target);
-            final HttpClientContext localcontext = HttpClientContext.adapt(
-                    context != null ? context : new BasicHttpContext());
+
+            //执行的上下文
+            final HttpClientContext localcontext = HttpClientContext.adapt(context != null ? context : new BasicHttpContext());
             RequestConfig config = null;
             if (request instanceof Configurable) {
                 config = ((Configurable) request).getConfig();
@@ -181,6 +186,7 @@ class InternalHttpClient extends CloseableHttpClient implements Configurable {
                 localcontext.setRequestConfig(config);
             }
             setupContext(localcontext);
+
             final HttpRoute route = determineRoute(target, wrapper, localcontext);
             return this.execChain.execute(route, wrapper, localcontext, execAware);
         } catch (final HttpException httpException) {

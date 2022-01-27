@@ -225,6 +225,7 @@ public class HttpClientBuilder {
         return new HttpClientBuilder();
     }
 
+    // note code
     protected HttpClientBuilder() {
         super();
     }
@@ -953,10 +954,13 @@ public class HttpClientBuilder {
             publicSuffixMatcherCopy = PublicSuffixMatcherLoader.getDefault();
         }
 
+        // 执行 http协议的客户端
         HttpRequestExecutor requestExecCopy = this.requestExec;
         if (requestExecCopy == null) {
             requestExecCopy = new HttpRequestExecutor();
         }
+
+        // connection manager
         HttpClientConnectionManager connManagerCopy = this.connManager;
         if (connManagerCopy == null) {
             LayeredConnectionSocketFactory sslSocketFactoryCopy = this.sslSocketFactory;
@@ -1006,6 +1010,7 @@ public class HttpClientBuilder {
                 if ("true".equalsIgnoreCase(s)) {
                     s = System.getProperty("http.maxConnections", "5");
                     final int max = Integer.parseInt(s);
+                    // 默认的情况下，maxTotal 是 defaultMaxPerRoute 的 2 倍
                     poolingmgr.setDefaultMaxPerRoute(max);
                     poolingmgr.setMaxTotal(2 * max);
                 }
@@ -1018,9 +1023,12 @@ public class HttpClientBuilder {
             }
             connManagerCopy = poolingmgr;
         }
+
+        // keep alive
         ConnectionReuseStrategy reuseStrategyCopy = this.reuseStrategy;
         if (reuseStrategyCopy == null) {
             if (systemProperties) {
+                // 默认为 true，开启 keepAlive 的
                 final String s = System.getProperty("http.keepAlive", "true");
                 if ("true".equalsIgnoreCase(s)) {
                     reuseStrategyCopy = DefaultClientConnectionReuseStrategy.INSTANCE;
@@ -1031,18 +1039,22 @@ public class HttpClientBuilder {
                 reuseStrategyCopy = DefaultClientConnectionReuseStrategy.INSTANCE;
             }
         }
+
         ConnectionKeepAliveStrategy keepAliveStrategyCopy = this.keepAliveStrategy;
         if (keepAliveStrategyCopy == null) {
             keepAliveStrategyCopy = DefaultConnectionKeepAliveStrategy.INSTANCE;
         }
+
         AuthenticationStrategy targetAuthStrategyCopy = this.targetAuthStrategy;
         if (targetAuthStrategyCopy == null) {
             targetAuthStrategyCopy = TargetAuthenticationStrategy.INSTANCE;
         }
+
         AuthenticationStrategy proxyAuthStrategyCopy = this.proxyAuthStrategy;
         if (proxyAuthStrategyCopy == null) {
             proxyAuthStrategyCopy = ProxyAuthenticationStrategy.INSTANCE;
         }
+
         UserTokenHandler userTokenHandlerCopy = this.userTokenHandler;
         if (userTokenHandlerCopy == null) {
             if (!connectionStateDisabled) {
@@ -1063,6 +1075,7 @@ public class HttpClientBuilder {
             }
         }
 
+        // http 的执行链
         ClientExecChain execChain = createMainExec(
                 requestExecCopy,
                 connManagerCopy,
@@ -1150,6 +1163,7 @@ public class HttpClientBuilder {
             execChain = new RetryExec(execChain, retryHandlerCopy);
         }
 
+
         HttpRoutePlanner routePlannerCopy = this.routePlanner;
         if (routePlannerCopy == null) {
             SchemePortResolver schemePortResolverCopy = this.schemePortResolver;
@@ -1196,6 +1210,7 @@ public class HttpClientBuilder {
                 .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
                 .build();
         }
+
         Lookup<CookieSpecProvider> cookieSpecRegistryCopy = this.cookieSpecRegistry;
         if (cookieSpecRegistryCopy == null) {
             cookieSpecRegistryCopy = CookieSpecRegistries.createDefault(publicSuffixMatcherCopy);
@@ -1251,6 +1266,7 @@ public class HttpClientBuilder {
             });
         }
 
+        // 最终返回的是：InternalHttpClient
         return new InternalHttpClient(
                 execChain,
                 connManagerCopy,

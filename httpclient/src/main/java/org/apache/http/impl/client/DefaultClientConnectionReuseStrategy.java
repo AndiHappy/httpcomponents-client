@@ -45,7 +45,7 @@ public class DefaultClientConnectionReuseStrategy extends DefaultConnectionReuse
 
     @Override
     public boolean keepAlive(final HttpResponse response, final HttpContext context) {
-
+        // http 链接的时，这个是如何响应的？
         final HttpRequest request = (HttpRequest) context.getAttribute(HttpCoreContext.HTTP_REQUEST);
         if (request != null) {
             final Header[] connHeaders = request.getHeaders(HttpHeaders.CONNECTION);

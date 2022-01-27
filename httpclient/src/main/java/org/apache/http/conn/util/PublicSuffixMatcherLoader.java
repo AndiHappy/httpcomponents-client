@@ -82,6 +82,7 @@ public final class PublicSuffixMatcherLoader {
         if (DEFAULT_INSTANCE == null) {
             synchronized (PublicSuffixMatcherLoader.class) {
                 if (DEFAULT_INSTANCE == null){
+                    //NOTE: public-suffix-list 一个知识点
                     final URL url = PublicSuffixMatcherLoader.class.getResource(
                             "/mozilla/public-suffix-list.txt");
                     if (url != null) {
